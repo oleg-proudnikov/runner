@@ -886,25 +886,16 @@ namespace GitHub.Runner.Worker
                         }
                     });
 
-                    if(onEFS)
-                    {
-                        int exitCode = await processInvoker.ExecuteAsync(stagingDirectory, tar, $"-xzf \"{archiveFile}\"", null, executionContext.CancellationToken);
-                            if (exitCode != 0)
-                            {
-                                var fileInfo = new FileInfo(archiveFile);
-                                var sha256hash = await IOUtil.GetFileContentSha256HashAsync(archiveFile);
-                                throw new InvalidActionArchiveException($"Can't use 'tar -xzf' extract archive file: {archiveFile} (SHA256 '{sha256hash}', size '{fileInfo.Length}' bytes, tar outputs '{string.Join(' ', tarOutputs)}'). Action being checked out: {downloadInfo.NameWithOwner}@{downloadInfo.Ref}. return code: {exitCode}.");
-                            }
-                        return;
-                    }
-
-
                     int exitCode = await processInvoker.ExecuteAsync(stagingDirectory, tar, $"-xzf \"{archiveFile}\"", null, executionContext.CancellationToken);
                     if (exitCode != 0)
                     {
                         var fileInfo = new FileInfo(archiveFile);
                         var sha256hash = await IOUtil.GetFileContentSha256HashAsync(archiveFile);
                         throw new InvalidActionArchiveException($"Can't use 'tar -xzf' extract archive file: {archiveFile} (SHA256 '{sha256hash}', size '{fileInfo.Length}' bytes, tar outputs '{string.Join(' ', tarOutputs)}'). Action being checked out: {downloadInfo.NameWithOwner}@{downloadInfo.Ref}. return code: {exitCode}.");
+                    }
+
+                    if(onEFS) {
+                        return;
                     }
                 }
 #endif
