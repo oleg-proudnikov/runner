@@ -792,7 +792,7 @@ namespace GitHub.Runner.Worker
 
             //download and extract action in a temp folder and rename it on success
             string tempDirectory = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Actions), "_temp_" + Guid.NewGuid());
-            onEFS = true
+            bool onEFS = true;
             if(onEFS){
                 tempDirectory = Path.Combine("/tmp", "_temp_" + Guid.NewGuid());
             }
@@ -895,7 +895,7 @@ namespace GitHub.Runner.Worker
                                 var sha256hash = await IOUtil.GetFileContentSha256HashAsync(archiveFile);
                                 throw new InvalidActionArchiveException($"Can't use 'tar -xzf' extract archive file: {archiveFile} (SHA256 '{sha256hash}', size '{fileInfo.Length}' bytes, tar outputs '{string.Join(' ', tarOutputs)}'). Action being checked out: {downloadInfo.NameWithOwner}@{downloadInfo.Ref}. return code: {exitCode}.");
                             }
-                    return
+                        return;
                     }
 
 
