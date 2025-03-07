@@ -792,6 +792,10 @@ namespace GitHub.Runner.Worker
 
             //download and extract action in a temp folder and rename it on success
             string tempDirectory = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Actions), "_temp_" + Guid.NewGuid());
+            onEFS = true
+            if(onEFS){
+                tempDirectory = Path.Combine("/tmp", "_temp_" + Guid.NewGuid());
+            }
             Directory.CreateDirectory(tempDirectory);
 
 #if OS_WINDOWS
@@ -847,6 +851,7 @@ namespace GitHub.Runner.Worker
                 var stagingDirectory = Path.Combine(tempDirectory, "_staging");
                 Directory.CreateDirectory(stagingDirectory);
 
+
 #if OS_WINDOWS
                 try
                 {
@@ -880,6 +885,19 @@ namespace GitHub.Runner.Worker
                             tarOutputs.Add($"STDERR: {args.Data}");
                         }
                     });
+
+                    if(onEFS)
+                    {
+                        int exitCode = await processInvoker.ExecuteAsync(stagingDirectory, tar, $"-xzf \"{archiveFile}\"", null, executionContext.CancellationToken);
+                            if (exitCode != 0)
+                            {
+                                var fileInfo = new FileInfo(archiveFile);
+                                var sha256hash = await IOUtil.GetFileContentSha256HashAsync(archiveFile);
+                                throw new InvalidActionArchiveException($"Can't use 'tar -xzf' extract archive file: {archiveFile} (SHA256 '{sha256hash}', size '{fileInfo.Length}' bytes, tar outputs '{string.Join(' ', tarOutputs)}'). Action being checked out: {downloadInfo.NameWithOwner}@{downloadInfo.Ref}. return code: {exitCode}.");
+                            }
+                    return
+                    }
+
 
                     int exitCode = await processInvoker.ExecuteAsync(stagingDirectory, tar, $"-xzf \"{archiveFile}\"", null, executionContext.CancellationToken);
                     if (exitCode != 0)
