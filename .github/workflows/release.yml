@@ -29,12 +29,14 @@ jobs:
             return
           }
           try {
+          /*
             const release = await github.repos.getReleaseByTag({
               owner: '${{ github.event.repository.owner.name }}',
               repo: '${{ github.event.repository.name }}',
               tag: 'v' + runnerVersion
             })
             core.setFailed('Release with same tag already created: ' + release.data.html_url)
+          */
           } catch (e) {
             // We are good to create the release if release with same tag doesn't exists
             if (e.status != 404) {
