@@ -893,10 +893,6 @@ namespace GitHub.Runner.Worker
                         var sha256hash = await IOUtil.GetFileContentSha256HashAsync(archiveFile);
                         throw new InvalidActionArchiveException($"Can't use 'tar -xzf' extract archive file: {archiveFile} (SHA256 '{sha256hash}', size '{fileInfo.Length}' bytes, tar outputs '{string.Join(' ', tarOutputs)}'). Action being checked out: {downloadInfo.NameWithOwner}@{downloadInfo.Ref}. return code: {exitCode}.");
                     }
-
-                    if(onEFS) {
-                        return;
-                    }
                 }
 #endif
 
